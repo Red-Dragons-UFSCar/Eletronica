@@ -43,20 +43,20 @@ while (1):
     # ROB0 3:     WASD
     if keys[pygame.K_w]:
         print("UP Robo WASD")
-        v3 = 30
-        v4 = 30
+        v3 = 50
+        v4 = 50
     elif keys[pygame.K_s]:
         print("DOWN Robo WASD")
-        v3 = -30
-        v4 = -30
+        v3 = -50
+        v4 = -50
     elif keys[pygame.K_a]:
         print("LEFT Robo WASD")
-        v3 = 10
-        v4 = -10
+        v3 = 20
+        v4 = -20
     elif keys[pygame.K_d]:
         print("RIGHT Robo WASD")
-        v3 = -10
-        v4 = 10
+        v3 = -20
+        v4 = 20
     else:
         v3 = 0
         v4 = 0

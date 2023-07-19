@@ -86,8 +86,8 @@ while True:
     direcao2 = dirMot1_Robo3<<6 | dirMot2_Robo3<<4
 
     # Vetor de mensagem para a eletrônica
-    if errorCode == 0: print("Palavra: ", [111, direcao1, direcao2, v1, v2, v3, v4, v5, v6, 112])
-    Rd = bytearray([111, direcao1, direcao2, abs(v1), abs(v2), abs(v3), abs(v4), abs(v5), abs(v6), 112])
+    if errorCode == 0: print("Palavra: ", [111, direcao1, direcao2, v1, v2, v3, v4, v5, v6, 113])
+    Rd = bytearray([111, direcao1, direcao2, abs(v1), abs(v2), abs(v3), abs(v4), abs(v5), abs(v6), 113])
     
     # Escrita na porta serial
     ser.write(Rd)
