@@ -209,10 +209,6 @@ void IRAM_ATTR onTime()
     if(SaidaA > 70){
       SaidaA = 70;
     }
-    if(SaidaA > SaidaAnteriorA*2 + 1)
-    {
-      SaidaA = SaidaA/3;
-    }
 
 
     volatile int AnteriorB = KpA*ErroAnterior1B;
@@ -225,10 +221,7 @@ void IRAM_ATTR onTime()
     if(SaidaB > 70){
       SaidaB = 70;
     }
-    if(SaidaB > SaidaAnteriorB*2 + 1)
-    {
-      SaidaB = SaidaB/3;
-    }
+    
     ErroAnterior1A = ErroAtualA;
     ErroAnterior1B = ErroAtualB;
     SaidaAnteriorA = SaidaA;
