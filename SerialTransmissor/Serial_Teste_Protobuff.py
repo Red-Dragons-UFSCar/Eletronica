@@ -93,6 +93,6 @@ while True:
     ser.write(Rd)
 
     # Leitura dos valores de bateria
-    #bateria_1 = ord(ser.read())
-    #bateria_2 = ord(ser.read())
-    #bateria_3 = ord(ser.read())
+    bateria_1 = ord(ser.read())
+    bateria_2 = ord(ser.read())
+    bateria_3 = ord(ser.read())
