@@ -93,10 +93,10 @@ while True:
     ser.write(Rd)
 
     # Leitura dos valores de bateria
-    if(ord(ser.read(111))):
-        bateria_1 = ord(ser.read())
-        bateria_2 = ord(ser.read())
-        bateria_3 = ord(ser.read())
-        b_4 = ord(ser.read())
-    if(b_4 == 113):
+    senha1 = ord(ser.read())
+    bateria_1 = ord(ser.read())
+    bateria_2 = ord(ser.read())
+    bateria_3 = ord(ser.read())
+    b_4 = ord(ser.read())
+    if(b_4 == 113 and senha1 == 111):
         bats = [bateria_1,bateria_2,bateria_3]
