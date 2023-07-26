@@ -8,6 +8,7 @@ hw_timer_t* timer = NULL;
 #include <WiFi.h>
 #include <esp_wifi.h>
 
+#define WIFI_CHANNEL 14
 
 int estado = 0;                   // Contador de palavras recebidas da mensagem
 bool start_message = false;       // Verificador de mensagem válida
@@ -135,7 +136,7 @@ void setup() {
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
   ESP_ERROR_CHECK(esp_wifi_start());
 
-  ESP_ERROR_CHECK(esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE));
+  ESP_ERROR_CHECK(esp_wifi_set_channel(WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE));
 
   esp_wifi_set_max_tx_power(84);
 
