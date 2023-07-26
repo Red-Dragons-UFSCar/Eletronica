@@ -4,6 +4,7 @@
 
 hw_timer_t* timer = NULL;
 #define ROBOT 3
+#define WIFI_CHANNEL 14
 
 // Bibliotecas para Comunicação ESP-NOW
 
@@ -314,7 +315,7 @@ void setup() {
   ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
   ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
   ESP_ERROR_CHECK( esp_wifi_start());
-  ESP_ERROR_CHECK( esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE));
+  ESP_ERROR_CHECK( esp_wifi_set_channel(WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE));
 
 
   if (esp_now_init() != ESP_OK) {
