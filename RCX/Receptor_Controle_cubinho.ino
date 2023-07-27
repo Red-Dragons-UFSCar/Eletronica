@@ -2,7 +2,7 @@ hw_timer_t* timer = NULL;
 #define ROBOT 3
 
 // Bibliotecas para Comunicação ESP-NOW
-#define WIFI_CHANNEL 14
+#define WIFI_CHANNEL 13
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
@@ -111,8 +111,8 @@ int pwm_a;
 int pwm_b;
 volatile double KpA = 1.5;
 volatile int KiA = 50;
-volatile double KpB = 50;
-volatile int KiB = 1.7;
+volatile double KpB = 1.7;
+volatile int KiB = 50;
 volatile double Soma_A = KpA+(KiA/100);
 volatile double Soma_B = KpB+(KiB/100);
 volatile int SaidaAnteriorA = 0;
