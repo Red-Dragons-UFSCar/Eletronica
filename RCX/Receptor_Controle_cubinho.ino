@@ -2,7 +2,7 @@ hw_timer_t* timer = NULL;
 #define ROBOT 3
 
 // Bibliotecas para Comunicação ESP-NOW
-#define WIFI_CHANNEL 13
+#define WIFI_CHANNEL 12
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
@@ -247,7 +247,7 @@ void IRAM_ATTR onTime()
       Escala_P1 = myData.RD[5];
       Escala_I1 = myData.RD[6];
       Escala_P2 = myData.RD[7];
-      Escala_P2 = myData.RD[8];
+      Escala_I2 = myData.RD[8];
       KpA = myData.RD[1]*(pow(10,Escala_P1*(-1)));
       KiA = myData.RD[2]*(pow(10,Escala_I1*(-1)));
       KpB = myData.RD[3]*(pow(10,Escala_P2*(-1)));
