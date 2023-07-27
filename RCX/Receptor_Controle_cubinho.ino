@@ -173,7 +173,6 @@ void IRAM_ATTR onTime()
         direcao2[0] = (*(myData.RD + 1) >> 1) & 1;
         direcao2[1] = (*(myData.RD + 1) >> 0) & 1;
       } else if (ROBOT == 3) {
-        if (ref_a != myData.RD[7]){
         ref_a = myData.RD[7];
         ref_b = myData.RD[8];
         direcao1[0] = (*(myData.RD + 2) >> 7) & 1;
@@ -181,16 +180,6 @@ void IRAM_ATTR onTime()
         direcao2[0] = (*(myData.RD + 2) >> 5) & 1;
         direcao2[1] = (*(myData.RD + 2) >> 4) & 1;
       }
-
-    
-    else {
-      ref_a = 0;
-      ref_b = 0;
-      direcao1[0] = false;
-      direcao1[1] = false;
-      direcao2[0] = false;
-      direcao2[1] = false;
-    }
     //Erro 
     ErroAtualA = ref_a - counterAB; // PQ Q O COUNTER TA INDO ATE 15 só ??????????????????????
     
@@ -269,7 +258,7 @@ void IRAM_ATTR onTime()
   }
   
 }
-}
+
 
 
 double ReadVoltage(byte pin){
