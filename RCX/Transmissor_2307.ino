@@ -9,7 +9,6 @@ hw_timer_t* timer = NULL;
 #include <esp_wifi.h>
 
 #define WIFI_CHANNEL 14
-
 int estado = 0;                   // Contador de palavras recebidas da mensagem
 bool start_message = false;       // Verificador de mensagem válida
 
@@ -105,11 +104,13 @@ void  IRAM_ATTR serial(){
         }
         //Envia a mensagem 
          esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
-         Serial.write(senha);
+         
+         //Serial.write(senha);
+
          for (int i = 0;i<3;i++){
           Serial.write(Robos[i].RD_R);
          }
-         Serial.write(senha_fim);
+         //Serial.write(senha_fim);
         
       }
          
