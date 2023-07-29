@@ -1,8 +1,8 @@
 hw_timer_t* timer = NULL;
-#define ROBOT 3
+#define ROBOT 1
 
 // Bibliotecas para Comunicação ESP-NOW
-#define WIFI_CHANNEL 12
+#define WIFI_CHANNEL 14
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
@@ -109,14 +109,14 @@ int SaidaA = 0;
 int SaidaB =0;
 int pwm_a;
 int pwm_b;
-volatile double KpA = 1.5;
-volatile int KiA = 50;
-volatile double KpB = 1.7;
-volatile int KiB = 50;
+volatile double KpA = 1.2;
+volatile double KiA = 50;
+volatile double KpB = 1.3;
+volatile double KiB = 50;
 volatile double Soma_A = KpA+(KiA/100);
 volatile double Soma_B = KpB+(KiB/100);
-volatile int SaidaAnteriorA = 0;
-volatile int SaidaAnteriorB = 0;
+volatile double SaidaAnteriorA = 0;
+volatile double SaidaAnteriorB = 0;
 volatile double AnteriorB = 0;
 volatile double Anterior2B = 0;
 volatile double AnteriorA = 0;
@@ -166,6 +166,7 @@ void IRAM_ATTR onTime()
         direcao2[0] = (*(myData.RD + 1) >> 5) & 1;
         direcao2[1] = (*(myData.RD + 1) >> 4) & 1;
       } else if (ROBOT == 2) {
+        
         ref_a = myData.RD[5];
         ref_b = myData.RD[6];
         direcao1[0] = (*(myData.RD + 1) >> 3) & 1;
@@ -180,13 +181,16 @@ void IRAM_ATTR onTime()
         direcao2[0] = (*(myData.RD + 2) >> 5) & 1;
         direcao2[1] = (*(myData.RD + 2) >> 4) & 1;
       }
+    
+  
+   
     //Erro 
-    ErroAtualA = ref_a - counterAB; // PQ Q O COUNTER TA INDO ATE 15 só ??????????????????????
+    ErroAtualA = ref_a/1.7409 - counterAB; // PQ Q O COUNTER TA INDO ATE 15 só ??????????????????????
     
     counterAB = 0;
     ErroAtualA = min(ErroAtualA, 30);
 
-    ErroAtualB = ref_b - counterAB_b;
+    ErroAtualB = ref_b/1.7409 - counterAB_b;
     counterAB_b = 0;
     ErroAtualB = min(ErroAtualB, 30);
 
@@ -203,7 +207,7 @@ void IRAM_ATTR onTime()
 
     }
 
-    valA=contA*23;
+    valA=contA*19;
     if((SaidaA >= valA)){
     SaidaA = valA;
     contA++;
@@ -222,7 +226,7 @@ void IRAM_ATTR onTime()
       Anterior2B = (ErroAtualB*Soma_B);
       SaidaB = Anterior2B - AnteriorB + SaidaAnteriorB;;
     }
-       valB=contB*23;
+       valB=contB*19;
        if(SaidaB >= valB){
        SaidaB = valB;
        contB++;
@@ -235,8 +239,8 @@ void IRAM_ATTR onTime()
     SaidaAnteriorA = SaidaA;
     SaidaAnteriorB = SaidaB;
     
-    pwm_b = map(SaidaB,0,30,150,255);
-    pwm_a = map(SaidaA,0,30,150,255);
+    pwm_b = map(SaidaB,0,30,200,255);
+    pwm_a = map(SaidaA,0,30,200,255);
     pwm_a = max(pwm_a,0);
     pwm_a = min(pwm_a,255);
     pwm_b = max(pwm_b,0);
@@ -258,7 +262,6 @@ void IRAM_ATTR onTime()
   }
   
 }
-
 
 
 double ReadVoltage(byte pin){
