@@ -181,11 +181,11 @@ void IRAM_ATTR onTime()
       Inicio do controle 
       */ 
       //Calculo do erro da Roda A
-      ErroAtualA = ref_a/3.48192 - counterAB; 
+      ErroAtualA = ref_a/1.74096 - counterAB; 
       counterAB = 0;
       ErroAtualA = min(ErroAtualA, 30);
       //Calculo do erro da Roda B
-      ErroAtualB = ref_b/3.48192 - counterAB_b;
+      ErroAtualB = ref_b/1.74096 - counterAB_b;
       counterAB_b = 0;
       ErroAtualB = min(ErroAtualB, 30);
 
