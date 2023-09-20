@@ -45,6 +45,7 @@ typedef struct return_message {
 
 // Cria a estrutura de dados para mensagem de envio
 struct_message myData;
+struct_message myDataTransmiter;
 
 //Cria as estruturas de dados para as mensagens de retorno
 return_message Return; 
@@ -56,8 +57,8 @@ return_message ReturnData3;
 return_message Robos[3] = {ReturnData1,ReturnData2,ReturnData3};
 #define led 2
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  digitalWrite(led,ledState);
-  ledState=1-ledState;
+  //digitalWrite(led,ledState);
+  //ledState=1-ledState;
 }
 
 void  OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
@@ -68,7 +69,11 @@ void  OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 }
 volatile int contador = 0;
 void IRAM_ATTR ontime(){
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData)); 
+  if(myData.dataAvaliable){
+    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData)); 
+    myData.dataAvaliable = false;
+  }
+  //esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
 } 
 
 void  IRAM_ATTR serial(){
@@ -84,6 +89,7 @@ void  IRAM_ATTR serial(){
     if(!start_message){                           // Se a mensagem não foi iniciada
 
       if(temp1 == senha){                           // Se a palavra lida for a senha
+          digitalWrite(led,1);
           myData.RD[estado] = temp1;                // Armazenamento da palavra na estrutura de dados na primeira posição
           estado++;                                 // Incremento da posição da mensagem
           start_message = true;                     // Inicio da leitura da mensagem
@@ -103,6 +109,7 @@ void  IRAM_ATTR serial(){
 
         if(temp1==senha_fim){                       // Verifica se a ultima palavra da mensagem é a senha final
           myData.dataAvaliable = true;
+          digitalWrite(led,0);
         } else {
           //Serial.println("Mensagem Invalida");
         }
@@ -116,6 +123,10 @@ void  IRAM_ATTR serial(){
           Serial.write(Robos[i].RD_R);
          }
          //Serial.write(senha_fim);
+
+         for(int i=0;i<myData.lengthVector;i++){
+            myDataTransmiter.RD[i] = myData.RD[i];
+         }
         
       }
          
