@@ -1,5 +1,5 @@
 hw_timer_t* timer = NULL;
-#define ROBOT 3
+#define ROBOT 2
 
 // Bibliotecas para Comunicação ESP-NOW
 #define WIFI_CHANNEL 13
@@ -97,7 +97,7 @@ volatile int  counterAB_b = 0;
 double leitura = 0;
 
 
-// CONTROLE
+// CONTROLE (Antigo)
 volatile int ErroAnterior1A = 0;
 volatile int ErroAnterior1B = 0;
 int ErroAtualA = 0;
@@ -144,9 +144,9 @@ int arranque = 0;
 volatile double speed1 = 0;
 volatile double speed2 = 0;
 
-/* New Control Variables */
+// Controle novo 
 const double Kc = 50;//279.8404 * 0.5;
-const double Td = 0.005;
+const double Td = 0.00;
 const double Ti = 0.03;//1.0132;
 const double T = 0.01;
 const double Ki = T*Kc/Ti;
@@ -166,7 +166,7 @@ volatile double prev1Speed2 = 0;
 volatile double prev2Speed2 = 0;
 volatile int uM2 = 0;
 
-volatile int contadorRef = 0;
+volatile int contadorRef = 0; // Auxiliar para troca de direcao
 
 // Filtro passa baixa
 const double alpha = 0.85;
@@ -176,6 +176,21 @@ volatile int filterCounterAB= 0;
 const double alpha_b = 0.85;
 volatile int prevCounterAB_b = 0;
 volatile int filterCounterAB_b= 0;
+
+// Tratamento de troca de direcao A
+volatile int signRefA = 0;
+volatile int signRefAnteriorA = 0;
+volatile int trocouDirecaoA = 0;
+volatile int contadorCiclosA = 0;
+
+// Tratamento de troca de direcao B
+volatile int signRefB = 0;
+volatile int signRefAnteriorB = 0;
+volatile int trocouDirecaoB = 0;
+volatile int contadorCiclosB = 0;
+
+// Tratamento de arranque
+volatile int saturador=0;
 
 //SOMADOR ENCODERS
 void IRAM_ATTR ai1() {
@@ -215,6 +230,8 @@ void IRAM_ATTR onTime()
         
         ref_a = myData.RD[5];
         ref_b = myData.RD[6];
+        num = ref_a;
+        teste=1;
         direcao1[0] = (*(myData.RD + 1) >> 3) & 1;
         direcao1[1] = (*(myData.RD + 1) >> 2) & 1;
         direcao2[0] = (*(myData.RD + 1) >> 1) & 1;
@@ -228,52 +245,120 @@ void IRAM_ATTR onTime()
         direcao2[1] = (*(myData.RD + 2) >> 4) & 1;
       }
 
-     // Teste de controle por referência fixa sem comunicação
-    /*if(contadorRef < 400){
-      ref_a = 0;
-      ref_b = 0;
-      contadorRef++;
-    } else if(contadorRef < 800){
-      ref_a = 60;
-      ref_b = 60;
-      contadorRef++;
-    } else{
-      ref_a = 60;
-      ref_b = 60;
+    speed1 = counterAB*CONV_ENC;
+    speed2 = counterAB_b*CONV_ENC;
+
+    // Verificar troca de direção motor A
+    signRefA = (ref_a > 0) - (ref_a < 0);
+    signRefAnteriorA = (ref_aAnterior > 0) - (ref_aAnterior < 0);
+
+    // Condições para realizar a troca de direção
+    //if((signRefA != signRefAnteriorA) && (contadorCiclosA>=10) ){
+    //  trocouDirecaoA = 1;
+    //}
+
+    // Trava de tempo para a troca de direções
+    if(contadorCiclosA<11){
+      contadorCiclosA++;
+    }
+    
+    if(trocouDirecaoA){
+      ref_a=-20;    // Referencia menor para desacelerar
+      if(speed1 < 15){ // Com velocidade pequena, ele permite a troca
+        trocouDirecaoA=0;
+        contadorCiclosA=0;
+      }
     }
 
-    if(ref_a > 0){
-      direcao1[0] = 0;
-      direcao1[1] = 1;
-    } else{
-      direcao1[0] = 1;
-      direcao1[1] = 0;
+    // Verificar troca de direção motor B
+    signRefB = (ref_b > 0) - (ref_b < 0);
+    signRefAnteriorB = (ref_bAnterior > 0) - (ref_bAnterior < 0);
+
+    // Condições para realizar a troca de direção
+    if((signRefB != signRefAnteriorB) && (contadorCiclosB>=10) ){
+      trocouDirecaoB = 1;
+    }
+
+    // Trava de tempo para a troca de direções
+    if(contadorCiclosB<11){
+      contadorCiclosB++;
+    }
+    
+    if(trocouDirecaoB){
+      ref_b=-20;  // Referencia menor para desacelerar
+      if(speed2 < 15){ // Com velocidade pequena, ele permite a troca
+        trocouDirecaoB=0;
+        contadorCiclosB=0;
+      }
+    }
+
+    ref_aAnterior = ref_a;
+    ref_bAnterior = ref_b;
+
+    // Adequação para definir a referência a partir da direção B*
+    if( direcao1[0] && !direcao1[1] ){
       ref_a = ref_a*(-1);
     }
 
+    // Se ele permite trocar a direção A
+    if(!trocouDirecaoA){
+    if(ref_a > 0){
+      direcao1[0] = 0;
+      direcao1[1] = 1;
+    } else if(ref_a < 0){
+      direcao1[0] = 1;
+      direcao1[1] = 0;
+      ref_a = ref_a*(-1);
+    } else{
+      direcao1[0] = 1;
+      direcao1[1] = 1;
+      ref_a = ref_a*(-1);
+      }
+    }
+
+    // Adequação para definir a referência a partir da direção B*
+    if( direcao2[0] && !direcao2[1] ){
+      ref_b = ref_b*(-1);
+    }
+
+    // Se ele permite trocar a direção B
+    if(!trocouDirecaoB){
     if(ref_b > 0){
       direcao2[0] = 0;
       direcao2[1] = 1;
-    } else{
+    } else if (ref_b < 0){
       direcao2[0] = 1;
       direcao2[1] = 0;
       ref_b = ref_b*(-1);
-    }*/
-
+    } else{
+      direcao2[1] = 1;
+      direcao2[1] = 1;
+    }
+    }
+    
     // Filtro passa-baixa
-    filterCounterAB = alpha*counterAB + (1-alpha)*prevCounterAB;
-    prevCounterAB = counterAB;
-    counterAB = filterCounterAB;
+    //filterCounterAB = alpha*counterAB + (1-alpha)*prevCounterAB;
+    //prevCounterAB = counterAB;
+    //counterAB = filterCounterAB;
 
-    filterCounterAB_b = alpha_b*counterAB_b + (1-alpha_b)*prevCounterAB_b;
-    prevCounterAB_b = counterAB_b;
-    counterAB_b = filterCounterAB_b;
+    //filterCounterAB_b = alpha_b*counterAB_b + (1-alpha_b)*prevCounterAB_b;
+    //prevCounterAB_b = counterAB_b;
+    //counterAB_b = filterCounterAB_b;
 
     // motor 1
     speed1 = counterAB*CONV_ENC;
     error = ref_a-speed1;
-    
     deltaU = Kc*(error - prevError1) + error*Ki - Kd*(speed1 - 2*prev1Speed1 + prev2Speed1);
+    deltaU = floor(deltaU);
+
+    // Tratamento de arranque
+    saturador = 200;
+    if(deltaU > saturador){
+      deltaU=saturador;
+    } else if (deltaU < -saturador){
+      deltaU = -saturador;
+    }
+    
     uM1 = uM1 + deltaU;
 
     // Saturador para ação de controle estar entre (0, 1024)
@@ -290,9 +375,17 @@ void IRAM_ATTR onTime()
     // motor 2
     speed2 = counterAB_b*CONV_ENC;
     error2 = ref_b-speed2;
-
     deltaU2 = Kc*(error2 - prevError2) + error2*Ki - Kd*(speed2 - 2*prev1Speed2 + prev2Speed2);
     deltaU2 = floor(deltaU2);
+
+    // Tratamento de arranque
+    saturador = 200;
+    if(deltaU2 > saturador){
+      deltaU2=saturador;
+    } else if (deltaU2 < -saturador){
+      deltaU2 = -saturador;
+    }
+    
     uM2 = uM2 + deltaU2;
 
     prevError2 = error2;
